@@ -1,0 +1,13 @@
+{
+  "name": "@matchbot/example",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@matchbot/core": "workspace:^",
+    "@matchbot/hockey": "workspace:^",
+    "@matchbot/soccer": "workspace:^"
+  }
+}
