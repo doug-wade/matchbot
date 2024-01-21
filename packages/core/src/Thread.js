@@ -4,5 +4,6 @@ export default class Thread {
         this.args = context.args;
         this.date = context.date;
         this.id = context.id;
+        this.completed = context.completed;
     }
 }

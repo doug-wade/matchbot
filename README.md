@@ -62,10 +62,11 @@ import soccer from '@matchbot/soccer';
 
 createBot({
     plugins: [
-        soccer({
-            teamId: 3002,
-            community: 'reign_fc',
-        }),
+        {
+            plugin: soccer,
+            config: { teamId: 3002 },
+            community_id: 86091,
+        },
     ]
 });
 ```

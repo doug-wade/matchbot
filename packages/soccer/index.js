@@ -1,5 +1,7 @@
-import { Plugin, Thread } from '@matchbot/core';
+import { Plugin, Thread, Post } from '@matchbot/core';
 
+import previewTemplate from './preview.js';
+import threadTemplate from './thread.js';
 export default class MatchbotSoccerPlugin extends Plugin {
     name = 'soccer';
     #baseUrl = 'https://v3.football.api-sports.io';
@@ -9,6 +11,7 @@ export default class MatchbotSoccerPlugin extends Plugin {
         super(context);
 
         this.teamId = context.config.teamId;
+        this.season = context.config.season;
 
         const headers = new Headers();
         headers.append("x-rapidapi-key", process.env.API_KEY);
@@ -21,9 +24,9 @@ export default class MatchbotSoccerPlugin extends Plugin {
     }
 
     async fixtures() {
-        const season = await this.#getLatestSeason();
-
+        const season = this.season || await this.#getLatestSeason();
         const url = `${this.#baseUrl}/fixtures?team=${this.teamId}&season=${season}`;
+
         let result = null;
         try {
             result = await this.fetch(url, this.#requestOptions);
@@ -39,14 +42,31 @@ export default class MatchbotSoccerPlugin extends Plugin {
                 id: fixture.id,
                 name,
                 date: fixture.timestamp,
-                args: fixture
+                args: fixture,
+                completed: fixture.status.short === 'FT',
             });
         });
     }
 
-    async preview(...args) { console.log('soccer preview', ...args); }
+    async preview({ id }) {
+        const fixture = await this.#getFixture(id);
+        const body = previewTemplate(fixture);
 
-    async thread(...args) { console.log('soccer thread', ...args); }
+        return new Post({
+            name: `[MATCH PREVIEW]: (${fixture.league.name} ${fixture.league.round}) ${fixture.teams.home.name} vs ${fixture.teams.away.name}`,
+            body,
+        });
+     }
+
+    async thread({ id }) {
+        const fixture = await this.#getFixture(id);
+        const body = threadTemplate(fixture);
+
+        return new Post({
+            name: `[MATCH THREAD]: (${fixture.league.name} ${fixture.league.round}) ${fixture.teams.home.name} vs ${fixture.teams.away.name}`,
+            body,
+        });
+    }
 
     async #getLatestSeason() {
         const url = `${this.#baseUrl}/teams/seasons?team=${this.teamId}`;
@@ -67,5 +87,18 @@ export default class MatchbotSoccerPlugin extends Plugin {
         const latestSeason = result.response[result.response.length - 1];
         this.logger.debug(`Found latest season ${latestSeason} for team ${this.teamId}`);
         return latestSeason;
+    }
+
+    async #getFixture(id) {
+        const url = `${this.#baseUrl}/fixtures?id=${id}`;
+
+        const result = await this.fetch(url, this.#requestOptions);
+
+        if (result.results === 0) {
+            this.logger.error('Fixture not found with id', id);
+            return null;
+        }
+
+        return result.response[0];
     }
 };

@@ -18,6 +18,8 @@ class DatabaseClient {
             matchThreadUrl: 'TEXT',
             previewed: 'BOOLEAN',
             previewThreadUrl: 'TEXT',
+            completed: 'BOOLEAN',
+            pluginName: 'TEXT',
         });
 
         if (this.cache) {
@@ -29,7 +31,7 @@ class DatabaseClient {
         }
     }
 
-    async putThread(thread) {
+    async putThread(thread, pluginName) {
         if (!thread.id) {
             throw new Error('Thread must have an id');
         }
@@ -45,10 +47,12 @@ class DatabaseClient {
         if (existingThread) {
             this.logger.debug(`Thread id ${existingThread.id} already exists in database, updating thread`);
             return new Promise((res, rej) => {
-                this.db.run('UPDATE threads SET name = $name, args = $args WHERE id=$id', {
+                this.db.run('UPDATE threads SET name = $name, args = $args, completed = $completed, pluginName = $pluginName WHERE id=$id', {
                     $id: existingThread.id,
                     $name: thread.name,
                     $args: thread.args,
+                    $completed: thread.completed,
+                    $pluginName: pluginName,
                 }, (err) => {
                     if (err) {
                         this.logger.error('Error updating thread', err);
@@ -64,13 +68,15 @@ class DatabaseClient {
         this.logger.log('Creating new thread', thread);
         return new Promise((res, rej) => {
             this.db.run(
-                'INSERT INTO threads(id, date, name, args, previewed) VALUES($id, $date, $name, $args, $previewed)',
+                'INSERT INTO threads(id, date, name, args, previewed, completed, pluginName) VALUES($id, $date, $name, $args, $previewed, $completed, $pluginName)',
                 {
                     $id: thread.id,
                     $date: thread.date,
                     $name: thread.name,
                     $args: JSON.stringify(thread.args),
                     $previewed: false,
+                    $completed: thread.completed,
+                    $pluginName: pluginName,
                 },
                 (err) => {
                     if (err) {
@@ -137,9 +143,11 @@ class DatabaseClient {
     }
 
     async getLiveMatches() {
-        const now = new Date();
+        const now = Date.now();
         return new Promise((res, rej) => {
-            this.db.all('SELECT * FROM threads WHERE date < $now;', { $now: now }, (err, threads) => {
+            this.db.all('SELECT * FROM threads WHERE date < $now AND completed = false;',
+            { $now: now },
+            (err, threads) => {
                 if (err) {
                     this.logger.error('Error getting threads needing preview', err);
                     return rej(err);
@@ -150,18 +158,23 @@ class DatabaseClient {
         });
     }
 
-    async getMatchesByTimestamp(date) {
-        const now = new Date();
+    async getMatchesByTimestamp(cutoff) {
+        const cutoffTimestamp = Math.floor(cutoff.valueOf() / 1000); 
+        const nowTimestamp = Math.floor(Date.now() / 1000);
 
         return new Promise((res, rej) => {
-            this.db.all('SELECT * FROM threads WHERE date < $date AND date > $now;', { $date: date, $now: now }, (err, threads) => {
-                if (err) {
-                    this.logger.error('Error getting threads needing preview', err);
-                    return rej(err);
+            this.db.all(
+                'SELECT * FROM threads WHERE date < $date AND date > $now;', 
+                { $date: cutoffTimestamp, $now: nowTimestamp }, 
+                (err, threads) => {
+                    if (err) {
+                        this.logger.error('Error getting threads needing preview', err);
+                        return rej(err);
+                    }
+                    
+                    res(threads);
                 }
-                
-                res(threads);
-            });
+            );
         });
     }
 
@@ -216,6 +229,22 @@ class DatabaseClient {
                 this.logger.debug(`Expired ${results.length} cache entries expired before cutoff`, cutoff);
                 res(results);
             });
+        });
+    }
+
+    async updateThreadPreviewed(id) {
+        return new Promise((res, rej) => {
+            this.db.run('UPDATE threads SET previewed = true WHERE id = $id', 
+                { $id: id },
+                (err, thread) => {
+                    if (err) {
+                        this.logger.error('Error updating thread', err);
+                        return rej(err);
+                    }
+
+                    res(thread);
+                }
+            );
         });
     }
 
