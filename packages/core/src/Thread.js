@@ -3,5 +3,6 @@ export default class Thread {
         this.name = context.name;
         this.args = context.args;
         this.date = context.date;
+        this.id = context.id;
     }
 }

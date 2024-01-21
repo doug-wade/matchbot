@@ -1,16 +1,16 @@
-import DatabaseClient from './DatabaseClient.js';
+import databaseClient from './DatabaseClient.js';
 import fetchFactory from './FetchClient.js';
 import LemmyClient from './LemmyClient.js';
 import Logger from './Logger.js';
 
-export default (userConfig) => {
+export default async (userConfig) => {
     const config = {
         dryRun: userConfig.dryRun || false,
-        previewThreadInterval: userConfig.previewThreadInterval || 28800000,
         cache: userConfig.cache || 0,
         instance: userConfig.instance || 'lemmy.world',
         verbose: userConfig.verbose || false,
-        matchPollInterval: userConfig.matchPollInterval || 300000,
+        previewPollInterval: userConfig.previewPollInterval || 28800000,
+        threadPollInterval: userConfig.threadPollInterval || 300000,
         fixturePollInterval: userConfig.fixturePollInterval || 86400000,
         userAgent: userConfig.userAgent || 'Mozilla/5.0 (compatible; @matchbot/1.0; +https://github.com/doug-wade/matchbot)',
         databaseFilename: userConfig.databaseFilename || 'matchbot.db',
@@ -19,9 +19,9 @@ export default (userConfig) => {
 
     const logger = new Logger(config);
 
-    logger.debug('creating bot with config', config);
+    logger.log('creating bot with config', config);
 
-    const db = new DatabaseClient(config, logger);
+    const db = await databaseClient(config, logger);
     const fetch = fetchFactory(config, db, logger);
 
     const plugins = config.plugins.map(plugin => {
@@ -38,28 +38,21 @@ export default (userConfig) => {
     });
 
     // Fetch future threads from all plugins to seed the database
-    plugins.forEach(async plugin => {
-        const matchThreads = await plugin.fixtures();
+    const updateFixtures = async () => {
+        return Promise.all(plugins.map(async plugin => {
+            logger.log(`Fetching fixtures for plugin ${plugin.name}`);
+            const matchThreads = await plugin.fixtures();
 
-        matchThreads.forEach(futureThread => {
-            db.putThread(futureThread);
-        });
-    });
-
-    // Start a timer to schedule threads when we find fixtures
-    setInterval(() => {
-        plugins.forEach(plugin => {
-            const matchThreads = plugin.fixtures();
-
-            matchThreads.forEach(thread => {
-                db.putThread(thread);
+            matchThreads.forEach(futureThread => {
+                db.putThread(futureThread);
             });
-        });
-    }, config.fixturePollInterval);
+        }));
+    };
 
-    // Start a timer to check for match previews every 5 minutes
-    setInterval(() => {
-        const matchesToPreview = db.getMatchesByTimestamp(new Date());
+    const updatePreviews = async () => {
+        const cutoff = new Date();
+        cutoff.setMilliseconds(cutoff.getMilliseconds() + config.previewThreadInterval);
+        const matchesToPreview = await db.getMatchesByTimestamp(cutoff);
 
         if (matchesToPreview.length === 0) {
             logger.debug('No matches to preview');
@@ -76,10 +69,12 @@ export default (userConfig) => {
                 db.updateThreadPreviewed(match.id);
             });
         }
+    }
 
-        const matchThreadsToUpdate = db.getLiveMatchesByTimestamp(new Date());
+    const updateThreads = async () => {
+        const matchThreadsToUpdate = db.getLiveMatches();
 
-        if (matchThreadsToUpdate.length === 0) {
+        if (!matchThreadsToUpdate.length || matchThreadsToUpdate.length === 0) {
             logger.debug('No match threads to update');
         } else {
             logger.debug(`Found ${matchThreadsToUpdate.length} match threads to update`);
@@ -93,5 +88,25 @@ export default (userConfig) => {
                 plugin.lemmy.updatePost(match.matchThreadUrl, matchThread);
             });
         }
-    }, config.matchPollInterval);
+    }
+
+    logger.log('Scheduling polling intervals');
+    setInterval(() => {
+        updateFixtures();
+    }, config.fixturePollInterval);
+
+    setInterval(() => {
+        updatePreviews();
+    }, config.threadPollInterval);
+
+    setInterval(() => {
+        updateThreads();
+    }, config.previewPollInterval);
+
+    logger.log('Doing initial fetch to seed database');
+    await updateFixtures();
+    await updatePreviews();
+    await updateThreads();
+
+    logger.log('Bot created');
 };
