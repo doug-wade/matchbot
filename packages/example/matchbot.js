@@ -5,27 +5,39 @@ import hockey from '@matchbot/hockey';
 createBot({
     instance: 'lemmy.world',
     verbose: true,
-    cache: 86400000,
+    cache: 24 * 60 * 60 * 1000,
     plugins: [
         {
-            community: 'soundersfc',
-            config: { teamId: 1595 },
+            community: 'bot_test',
+            config: { teamId: 40 },
             plugin: soccer,
         },
         {
-            community: 'reign_fc',
-            config: { teamId: 3002 },
-            plugin: soccer,
-        },
-        {
-            community: 'ballardfc',
-            config: { teamId: 18882 },
-            plugin: soccer,
-        },
-        {
-            community: 'seattlekraken',
+            community: 'bot_test',
             config: { teamId: 1436 },
             plugin: hockey,
-        },
+        }
+        
+        // Real config:
+        // {
+        //     community: 'soundersfc',
+        //     config: { teamId: 1595 },
+        //     plugin: soccer,
+        // },
+        // {
+        //     community: 'reign_fc',
+        //     config: { teamId: 3002 },
+        //     plugin: soccer,
+        // },
+        // {
+        //     community: 'ballardfc',
+        //     config: { teamId: 18882 },
+        //     plugin: soccer,
+        // },
+        // {
+        //     community: 'seattlekraken',
+        //     config: { teamId: 1436 },
+        //     plugin: hockey,
+        // },
     ]
 });

@@ -1,21 +1,21 @@
 import { Plugin } from '@matchbot/core';
 
 export default class MatchbotHockeyPlugin extends Plugin {
-    static name = 'hockey';
+    name = 'hockey';
 
     async fixtures() {
-        this.logger.log('getting fixtures');
+        this.logger.log('getting hockey fixtures');
 
         return [];
     }
     async preview() {
-        this.logger.log('getting preview');
+        this.logger.log('getting hockey preview');
 
         return '';
     }
 
     async thread() {
-        this.logger.log('getting thread');
+        this.logger.log('getting hockey thread');
 
         return '';
     }

@@ -23,22 +23,19 @@ export default (config, db, logger) => {
             if (cacheEntry) {
                 logger.debug('Returning cached result for', url);
 
-                return { 
-                    async json() {
-                        return Promise.resolve(JSON.parse(cacheEntry.response));
-                    }
-                };
+                return Promise.resolve(JSON.parse(cacheEntry.response));
             } else {
                 logger.debug('Cache miss for url', url);
             }
         }
 
         const result = await fetch(url, ...args);
+        const json = await result.json();
 
-        if (config.cache) {
-            db.putCacheEntry(url, await result.text());
+        if (config.cache && result.status >= 200 && result.status < 300) {
+            db.putCacheEntry(url, JSON.stringify(json));
         }
 
-        return result;
+        return json;
     }
 }
