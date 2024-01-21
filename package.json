@@ -1,0 +1,15 @@
+{
+  "name": "matchbot",
+  "description": "A pluggable Lemmy bot for conducting match threads.",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Douglas Wade <douglas.b.wade@gmail.com>",
+  "license": "MIT",
+  "workspaces": [
+    "packages/core",
+    "packages/soccer",
+    "packages/hockey",
+    "packages/example"
+  ],
+  "packageManager": "yarn@4.0.2"
+}
