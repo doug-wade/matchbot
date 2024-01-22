@@ -13,6 +13,7 @@
   ],
   "packageManager": "yarn@4.0.2",
   "scripts": {
+    "ci-lint": "eslint packages/**/*.js --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif",
     "lint": "eslint packages/**/*.js"
   },
   "devDependencies": {
