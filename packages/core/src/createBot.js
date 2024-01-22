@@ -73,7 +73,7 @@ export default async (userConfig) => {
                 db.updateThreadPreviewed(match.id);
             });
         }
-    }
+    };
 
     const updateThreads = async () => {
         const matchThreadsToUpdate = db.getLiveMatches();
@@ -84,7 +84,7 @@ export default async (userConfig) => {
             logger.debug(`Found ${matchThreadsToUpdate.length} match threads to update`);
 
             matchThreadsToUpdate.forEach(async (match) => {
-                const plugin = plugins.find(plugin => plugin.name === matchesToPreview.name)[0];
+                const plugin = plugins.find(plugin => plugin.name === match.pluginName)[0];
                 const matchThread = await plugin.postMatchThread(match);
 
                 logger.log(`Updating match thread for fixture with id ${match.id}`);
@@ -92,7 +92,7 @@ export default async (userConfig) => {
                 plugin.lemmy.updatePost(match.matchThreadUrl, matchThread);
             });
         }
-    }
+    };
 
     logger.log('Scheduling polling intervals');
     setInterval(() => {

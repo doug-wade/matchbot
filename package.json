@@ -11,5 +11,11 @@
     "packages/hockey",
     "packages/example"
   ],
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.0.2",
+  "scripts": {
+    "lint": "eslint packages/**/*.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0"
+  }
 }

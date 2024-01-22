@@ -14,8 +14,8 @@ export default class MatchbotSoccerPlugin extends Plugin {
         this.season = context.config.season;
 
         const headers = new Headers();
-        headers.append("x-rapidapi-key", process.env.API_KEY);
-        headers.append("x-rapidapi-host", this.#baseUrl);
+        headers.append('x-rapidapi-key', process.env.API_KEY);
+        headers.append('x-rapidapi-host', this.#baseUrl);
         this.#requestOptions = {
             method: 'GET',
             headers,
@@ -56,7 +56,7 @@ export default class MatchbotSoccerPlugin extends Plugin {
             name: `[MATCH PREVIEW]: (${fixture.league.name} ${fixture.league.round}) ${fixture.teams.home.name} vs ${fixture.teams.away.name}`,
             body,
         });
-     }
+    }
 
     async thread({ id }) {
         const fixture = await this.#getFixture(id);
@@ -101,4 +101,4 @@ export default class MatchbotSoccerPlugin extends Plugin {
 
         return result.response[0];
     }
-};
+}
