@@ -9,5 +9,8 @@
     "@matchbot/core": "workspace:^",
     "@matchbot/hockey": "workspace:^",
     "@matchbot/soccer": "workspace:^"
+  },
+  "scripts": {
+    "start": "node matchbot.js"
   }
 }
