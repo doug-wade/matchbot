@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
 // plugin api
+export { default as Post } from './Post.js';
 export { default as Thread } from './Thread.js';
 export { default as Plugin } from './Plugin.js';
 

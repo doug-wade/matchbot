@@ -1,6 +1,6 @@
 import databaseClient from './DatabaseClient.js';
 import fetchFactory from './FetchClient.js';
-import LemmyClient from './LemmyClient.js';
+import lemmyClient from './LemmyClient.js';
 import Logger from './Logger.js';
 
 export default async (userConfig) => {
@@ -21,19 +21,22 @@ export default async (userConfig) => {
 
     logger.log('creating bot with config', config);
 
+    logger.log('creating database', config.databaseFilename, 'with cache', config.cache, 'ms');
     const db = await databaseClient(config, logger);
     const fetch = fetchFactory(config, db, logger);
 
-    const plugins = config.plugins.map(plugin => {
-        const lemmy = new LemmyClient(config);
+    logger.log('logging bot into lemmy instance', config.instance, 'as', process.env.LEMMY_USERNAME);
+    const lemmy = await lemmyClient(config, logger);
 
+    const plugins = config.plugins.map(plugin => {
         return new plugin.plugin({
             ...config,
             db,
             fetch,
             lemmy,
             logger,
-            config: plugin.config
+            config: plugin.config,
+            community_id: plugin.community_id,
         });
     });
 
@@ -44,14 +47,14 @@ export default async (userConfig) => {
             const matchThreads = await plugin.fixtures();
 
             matchThreads.forEach(futureThread => {
-                db.putThread(futureThread);
+                db.putThread(futureThread, plugin.name);
             });
         }));
     };
 
     const updatePreviews = async () => {
         const cutoff = new Date();
-        cutoff.setMilliseconds(cutoff.getMilliseconds() + config.previewThreadInterval);
+        cutoff.setMilliseconds(cutoff.getMilliseconds() + config.previewPollInterval);
         const matchesToPreview = await db.getMatchesByTimestamp(cutoff);
 
         if (matchesToPreview.length === 0) {
@@ -60,12 +63,13 @@ export default async (userConfig) => {
             logger.debug(`Found ${matchesToPreview.length} matches to preview`);
 
             matchesToPreview.forEach(async (match) => {
-                const plugin = plugins.find(plugin => plugin.name === matchesToPreview.name)[0];
+                const plugin = plugins.find(plugin => plugin.name === match.pluginName);
+
                 const preview = await plugin.preview(match);
 
                 logger.log(`Creating match preview for fixture with id ${match.id}`);
 
-                plugin.lemmy.createPost(preview);
+                plugin.lemmy.createPost(preview, plugin.community_id);
                 db.updateThreadPreviewed(match.id);
             });
         }

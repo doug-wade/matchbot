@@ -3,5 +3,8 @@
   "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "handlebars": "^4.7.7"
+  }
 }

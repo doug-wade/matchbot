@@ -8,34 +8,34 @@ createBot({
     cache: 24 * 60 * 60 * 1000,
     plugins: [
         {
-            community: 'bot_test',
-            config: { teamId: 40 },
+            community_id: 41717, // bot_test
+            config: { teamId: 2282, season: '2023' },
             plugin: soccer,
         },
         {
-            community: 'bot_test',
+            community_id: 41717, // bot_test
             config: { teamId: 1436 },
             plugin: hockey,
         }
         
         // Real config:
         // {
-        //     community: 'soundersfc',
+        //     community: 65003, // soundersfc
         //     config: { teamId: 1595 },
         //     plugin: soccer,
         // },
         // {
-        //     community: 'reign_fc',
+        //     community: 86091, // reign_fc
         //     config: { teamId: 3002 },
         //     plugin: soccer,
         // },
         // {
-        //     community: 'ballardfc',
+        //     community: 86115 // ballard_fc
         //     config: { teamId: 18882 },
         //     plugin: soccer,
         // },
         // {
-        //     community: 'seattlekraken',
+        //     community: 5344 // seattlekraken
         //     config: { teamId: 1436 },
         //     plugin: hockey,
         // },
