@@ -93,7 +93,7 @@ class DatabaseClient {
 
     async addPreviewUrlToThread(id, previewThreadUrl) {
         return new Promise((res, rej) => {
-            db.run('UPDATE threads SET previewThreadUrl = $previewThreadUrl WHERE id = $id', {
+            this.db.run('UPDATE threads SET previewThreadUrl = $previewThreadUrl WHERE id = $id', {
                 $id: id,
                 $previewThreadUrl: previewThreadUrl
             }, (err, thread) => {
@@ -110,7 +110,7 @@ class DatabaseClient {
 
     async addMatchThreadUrlToThread(id, matchThreadUrl) {
         return new Promise((res, rej) => {
-            db.run('UPDATE threads SET matchThreadUrl = $matchThreadUrl WHERE id = $id', {
+            this.db.run('UPDATE threads SET matchThreadUrl = $matchThreadUrl WHERE id = $id', {
                 $id: id,
                 $matchThreadUrl: matchThreadUrl
             }, (err, thread) => {
@@ -119,7 +119,7 @@ class DatabaseClient {
                     return rej(err);
                 }
 
-                this.logger.debug(`Added previewThreadUrl ${previewThreadUrl}to thread ${id}`);
+                this.logger.debug(`Added matchThreadUrl ${matchThreadUrl}to thread ${id}`);
                 res(thread);
             });
         });
@@ -146,15 +146,15 @@ class DatabaseClient {
         const now = Date.now();
         return new Promise((res, rej) => {
             this.db.all('SELECT * FROM threads WHERE date < $now AND completed = false;',
-            { $now: now },
-            (err, threads) => {
-                if (err) {
-                    this.logger.error('Error getting threads needing preview', err);
-                    return rej(err);
-                }
+                { $now: now },
+                (err, threads) => {
+                    if (err) {
+                        this.logger.error('Error getting threads needing preview', err);
+                        return rej(err);
+                    }
                 
-                res(threads);
-            });
+                    res(threads);
+                });
         });
     }
 
@@ -294,4 +294,4 @@ export default async (config, logger) => {
     dbClient = localDbClient;
 
     return dbClient;
-}
+};

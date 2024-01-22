@@ -7,4 +7,4 @@ export default class Plugin {
         this.lemmy = context.lemmy;
         this.logger = context.logger;
     }
-};
+}

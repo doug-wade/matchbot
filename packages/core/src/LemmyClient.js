@@ -69,4 +69,4 @@ export default async (config, logger) => {
     lemmyClient = localLemmyClient;
 
     return lemmyClient;
-}
+};
