@@ -3,8 +3,8 @@ module.exports = {
         'process': true
     },
     'env': {
-        'browser': true,
-        'es2021': true
+        'node': true,
+        'es2022': true
     },
     'extends': 'eslint:recommended',
     'overrides': [

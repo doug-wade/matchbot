@@ -15,6 +15,8 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
+  schedule:
+    - cron: "45 15 * * 3"
 
 jobs:
   eslint:
@@ -45,11 +47,7 @@ jobs:
         run: yarn install
 
       - name: Run ESLint
-        run: npx eslint .
-          --config .eslintrc.js
-          --ext .js,.jsx,.ts,.tsx
-          --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
+        run: yarn ci-lint
         continue-on-error: true
 
       - name: Upload analysis results to GitHub
