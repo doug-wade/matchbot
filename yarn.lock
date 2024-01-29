@@ -1360,6 +1360,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lcov@npm:^1.16.0":
+  version: 1.16.0
+  resolution: "lcov@npm:1.16.0"
+  bin:
+    get_version.sh: get_version.sh
+    lcov: lcov
+  checksum: 8fefe80e6ea4653ed91fe5b43c6654002d8e63a9434cbf50157f3f3df37076ce3289b50527580d393cd3ee35e6cc43355cdf2e430a063184e221281161f1d3cf
+  languageName: node
+  linkType: hard
+
 "lemmy-js-client@npm:^0.18.1":
   version: 0.18.1
   resolution: "lemmy-js-client@npm:0.18.1"
@@ -1469,6 +1479,7 @@ __metadata:
     "@microsoft/eslint-formatter-sarif": "npm:^3.0.0"
     eslint: "npm:^8.56.0"
     esmock: "npm:^2.6.3"
+    lcov: "npm:^1.16.0"
   languageName: unknown
   linkType: soft
 

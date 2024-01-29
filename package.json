@@ -15,11 +15,13 @@
   "scripts": {
     "ci-lint": "eslint packages/**/*.js --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif",
     "lint": "eslint packages/**/*.js",
+    "ci-test": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=lcov.info",
     "test": "node --test"
   },
   "devDependencies": {
     "@microsoft/eslint-formatter-sarif": "^3.0.0",
     "eslint": "^8.56.0",
-    "esmock": "^2.6.3"
+    "esmock": "^2.6.3",
+    "lcov": "^1.16.0"
   }
 }
