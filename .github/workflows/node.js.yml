@@ -21,6 +21,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - name: Enable Corepack before setting up Node
+      run: corepack enable
       
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
