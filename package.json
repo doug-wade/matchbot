@@ -14,10 +14,12 @@
   "packageManager": "yarn@4.0.2",
   "scripts": {
     "ci-lint": "eslint packages/**/*.js --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif",
-    "lint": "eslint packages/**/*.js"
+    "lint": "eslint packages/**/*.js",
+    "test": "node --test"
   },
   "devDependencies": {
     "@microsoft/eslint-formatter-sarif": "^3.0.0",
-    "eslint": "^8.56.0"
+    "eslint": "^8.56.0",
+    "esmock": "^2.6.3"
   }
 }

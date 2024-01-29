@@ -1,13 +1,13 @@
 import chalk from 'chalk';
 
 export default class Logger {
-    constructor(config) {
+    constructor(config = {}) {
         this.verbose = config.verbose;
     }
 
     debug(...args) {
         if (this.verbose) {
-            console.log(chalk.green('[DEBUG]'), ...args);
+            console.debug(chalk.green('[DEBUG]'), ...args);
         }
     }
 

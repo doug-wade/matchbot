@@ -799,6 +799,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esmock@npm:^2.6.3":
+  version: 2.6.3
+  resolution: "esmock@npm:2.6.3"
+  checksum: a9e0733eb1e236d2710b8af6c12be715d766a0fb8dd1aa88b580df3b56469354482f0d3beb4da387a34dadf5718518d62d8e8cc683139cc8169010f954c80fd8
+  languageName: node
+  linkType: hard
+
 "espree@npm:^9.6.0, espree@npm:^9.6.1":
   version: 9.6.1
   resolution: "espree@npm:9.6.1"
@@ -1461,6 +1468,7 @@ __metadata:
   dependencies:
     "@microsoft/eslint-formatter-sarif": "npm:^3.0.0"
     eslint: "npm:^8.56.0"
+    esmock: "npm:^2.6.3"
   languageName: unknown
   linkType: soft
 
